@@ -3,7 +3,19 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Bullet
+  - Coin1
+  - Coin5
+  - CheckPoint
+  - Item
+  - ShopPanel
+  - UIInventoryChest
+  - Chest
+  - TagsManager
+  - ChestManager
+  - CraftPanel
+  - QuantitySelector
   layers:
   - Default
   - TransparentFX
@@ -12,12 +24,12 @@ TagManager:
   - Water
   - UI
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - PlayerFeet
+  - Environnement
+  - Enemy
+  - Coin
+  - Bullet
+  - Item
   - 
   - 
   - 

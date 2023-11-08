@@ -5,7 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/DreamJour1.unity
+    guid: 19bf878337e35464992366fe43f7f941
+  - enabled: 1
+    path: Assets/Scenes/SpiderJour2.unity
+    guid: c9aba26ea066c4542b1ae4614f6c1208
   m_configObjects: {}

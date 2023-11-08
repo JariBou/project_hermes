@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f83928a686ed44f42a703187b7ee66c8, type: 3}
+  m_Name: Pomme
+  m_EditorClassIdentifier: 
+  <lootSprite>k__BackingField: {fileID: 21300000, guid: 8657976283be26147a13f5f6663ca29f, type: 3}
+  <lootName>k__BackingField: Pomme
+  dropChance: 25
+  <IsStackable>k__BackingField: 1
+  <MaxStackSize>k__BackingField: 64
+  modifierData:
+  - statModifier: {fileID: 11400000, guid: 74ccb96ef6d701b4fa4cb20122fc3113, type: 2}
+    value: 1
