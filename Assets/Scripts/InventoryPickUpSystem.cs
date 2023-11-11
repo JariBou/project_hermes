@@ -46,94 +46,77 @@ public class InventoryPickUpSystem : MonoBehaviour
     {
         Debug.Log("Ajout");
         int reminder;
-        bool canStack = false;
-        if (item.InventoryItem.IsStackable)
+        int reminder2;
+        reminder = toolbarInventoryData.AddItem(item.InventoryItem, item.Quantity);
+        if (reminder == 0)
         {
-            foreach (InventoryItem itm in toolbarInventoryData.inventoryItems)
+            StartCoroutine(item.AnimateItemPickup());
+        }
+        else if (reminder > 0)
+        {
+            reminder2 = mainInventoryData.AddItem(item.InventoryItem, reminder);
+            if (reminder2 == 0)
             {
-                if (item.InventoryItem == itm.item && (item.Quantity + itm.quantity) <= itm.item.MaxStackSize)
-                {
-                    canStack = true;
-                }
-            }
-            if (!toolbarInventoryData.IsInventoryFull() && canStack)
-            {
-                reminder = toolbarInventoryData.AddItem(item.InventoryItem, item.Quantity);
-                if (reminder == 0)
-                {
-                    StartCoroutine(item.AnimateItemPickup());
-                }
-                else
-                {
-                    item.Quantity = reminder;
-                }
+                StartCoroutine(item.AnimateItemPickup());
             }
             else
             {
-                canStack = false;
-                foreach (InventoryItem itm in mainInventoryData.inventoryItems)
-                {
-                    if (item.InventoryItem == itm.item && (item.Quantity + itm.quantity) <= itm.item.MaxStackSize)
-                    {
-                        canStack = true;
-                    }
-                }
-                if (canStack)
-                {
-                    reminder = mainInventoryData.AddItem(item.InventoryItem, item.Quantity);
-                    if (reminder == 0)
-                    {
-                        StartCoroutine(item.AnimateItemPickup());
-                    }
-                    else
-                    {
-                        item.Quantity = reminder;
-                    }
-                }
+                item.Quantity = reminder2;
             }
         }
-        else
-        {
-            if (!toolbarInventoryData.IsInventoryFull())
-            {
-                reminder = toolbarInventoryData.AddItem(item.InventoryItem, item.Quantity);
-                if (reminder == 0)
-                {
-                    StartCoroutine(item.AnimateItemPickup());
-                }
-                else
-                {
-                    item.Quantity = reminder;
-                }
-            }
-            else
-            {
+        
 
-                reminder = mainInventoryData.AddItem(item.InventoryItem, item.Quantity);
-                if (reminder == 0)
-                {
-                    StartCoroutine(item.AnimateItemPickup());
-                }
-                else
-                {
-                    item.Quantity = reminder;
-                }
+        
+
                 
-            }
-        }
+        
+        
 
     }
 
-    public int AddItemFromShop(Item item)
+    public int AddItemFromShop(LootFortune item, int quantity, InventorySO inventory1, InventorySO inventory2)
     {
         /*Debug.Log("Ajout");*/
         int reminder;
-        reminder = toolbarInventoryData.AddItem(item.InventoryItem, item.Quantity);
+        reminder = inventory1.AddItem(item, quantity);
         if (reminder > 0)
         {
-            item.Quantity = reminder;
-            reminder = mainInventoryData.AddItem(item.InventoryItem, item.Quantity);
+            quantity = reminder;
+            reminder = inventory2.AddItem(item, quantity);
         }
         return reminder;
     }
+
+    public int RemoveItemQuantityFromInventory(LootFortune item, int quantity, InventorySO inventory1)
+    {
+        for (int i = 0; i < inventory1.Size; i++)
+        {
+            if (inventory1.inventoryItems[i].item == item)
+            {
+                if (inventory1.inventoryItems[i].quantity - quantity > 0)
+                {
+                    inventory1.inventoryItems[i] = inventory1.inventoryItems[i].ChangeQuantity(inventory1.inventoryItems[i].quantity - quantity);
+                    inventory1.InformAboutChange();
+                    return 0;
+                }
+                else if (inventory1.inventoryItems[i].quantity - quantity == 0)
+                {
+                    inventory1.inventoryItems[i] = InventoryItem.GetEmptyItem();
+                    inventory1.InformAboutChange();
+                    return 0;
+
+                }
+                else
+                {
+                    quantity -= inventory1.inventoryItems[i].quantity;
+                    inventory1.inventoryItems[i] = InventoryItem.GetEmptyItem();
+                    inventory1.InformAboutChange();
+                }
+            }
+        }
+        return quantity;
+
+        
+    }
+
 }

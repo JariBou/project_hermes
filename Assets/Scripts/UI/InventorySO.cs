@@ -80,8 +80,7 @@ namespace Inventory.Model
                 if (inventoryItems[i].IsEmpty) continue;
                 if (inventoryItems[i].item.ID == item.ID)
                 {
-                    int amountPossibleToTake = 
-                        inventoryItems[i].item.MaxStackSize - inventoryItems[i].quantity;
+                    int amountPossibleToTake =  inventoryItems[i].item.MaxStackSize - inventoryItems[i].quantity;
 
                     if (quantity > amountPossibleToTake)
                     {
@@ -91,8 +90,7 @@ namespace Inventory.Model
                     }
                     else
                     {
-                        inventoryItems[i] = inventoryItems[i].ChangeQuantity(inventoryItems[i]
-                            .quantity + quantity);
+                        inventoryItems[i] = inventoryItems[i].ChangeQuantity(inventoryItems[i].quantity + quantity);
                         InformAboutChange();
                         return 0;
                     }

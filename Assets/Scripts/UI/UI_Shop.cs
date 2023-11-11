@@ -20,6 +20,8 @@ public class UI_Shop : MonoBehaviour
     [SerializeField] private InventoryPickUpSystem inventoryPickUp;
     public List<ItemShop> itemSold = new List<ItemShop>();
     public InputGame _playerInput;
+    [SerializeField] InventorySO MainInventory;
+    [SerializeField] InventorySO ToolBarInventory;
 
     private void Awake()
     {
@@ -52,7 +54,7 @@ public class UI_Shop : MonoBehaviour
             ColorBlock colors = button.colors;
             if (itemButton.prix <= goldCount.Gold)
             {
-                int reminder = inventoryPickUp.AddItemFromShop(itemButton.GetComponent<Item>());
+                int reminder = inventoryPickUp.AddItemFromShop(itemButton.GetComponent<Item>().InventoryItem, itemButton.GetComponent<Item>().Quantity, ToolBarInventory, MainInventory);
                 if (reminder == 0) 
                 {
                     goldCount.Gold -= itemButton.prix;

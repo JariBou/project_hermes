@@ -13,11 +13,11 @@ using UnityEngine.InputSystem;
 
 public class CraftSysteme : MonoBehaviour
 {
-    private bool firstFramePassed;
     private InputGame _input;
     public string SelectedItem;
 
     [Header("Gestion des inventaires")]
+    [SerializeField] private InventoryController _controller;
     [SerializeField] private InventorySO mainInventory;
     [SerializeField] private InventorySO toolbarInventory;
 
@@ -45,19 +45,20 @@ public class CraftSysteme : MonoBehaviour
 
     void Start()
     {
-        InitializeData();  
+        InitializeData();
+        StartCoroutine(Wait1FrameBeforeDo());
+        _controller =  GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>();  
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!firstFramePassed)
-        {
-            firstFramePassed = true;
+    }
 
-            
-
-        }
+    IEnumerator Wait1FrameBeforeDo() // Solution dégueulasse pour régler un problème qui fesait que le tableau ne s'affichait pas à la première ouverture du panel craft
+    {
+        yield return new WaitForEndOfFrame();
+        SetData(listItemCraft[0].name);
     }
 
     void InitializeData()
@@ -75,7 +76,6 @@ public class CraftSysteme : MonoBehaviour
             item.transform.SetParent(itemListPage);
             item.GetComponent<UI_CraftItem>().SetData(craftableItem.item.lootSprite, craftableItem.name);
         }
-        SetData(listItemCraft[0].name);
         itemListPage.GetChild(1).gameObject.GetComponent<UI_CraftItem>().Select();
 
     }
@@ -83,11 +83,12 @@ public class CraftSysteme : MonoBehaviour
     {
         if (FindIndexWithItemName(itemName) != -1)
         {
+            SetTable(itemName);
             ItemCraft craft = listItemCraft[FindIndexWithItemName(itemName)];
             nomItem.text = craft.name;
             descriptionItem.text = craft.description;
             imageItem.sprite = craft.item.lootSprite;
-            SetTable(itemName);
+            
         }
     }
 
@@ -103,8 +104,9 @@ public class CraftSysteme : MonoBehaviour
             tableLine.transform.SetParent(contentTable);
         }
     }
-    private void SetTable(string itemName)
+    public void SetTable(string itemName)
     {
+        if (FindIndexWithItemName(itemName) == -1) return;
         ItemCraft item = listItemCraft[FindIndexWithItemName(itemName)];
         if (item.ItemRequirements.Count <= 4)
         {
@@ -166,16 +168,52 @@ public class CraftSysteme : MonoBehaviour
         return quantity;
     }
 
+    public void Craft()
+    {
+        ItemCraft item = listItemCraft[FindIndexWithItemName(SelectedItem)];
+        bool canCraft = true;
+        foreach (ItemCraftRequirements craftRequirement in item.ItemRequirements)
+        {
+            if (craftRequirement.quantityRequired > FindQuantityPossed(craftRequirement.itemRequired)) canCraft = false;
+        }
+        if (canCraft)
+            {
+                InventoryPickUpSystem inventoryPickUp = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryPickUpSystem>();
+                int quantitySelector = GameObject.FindGameObjectWithTag("QuantitySelector").GetComponent<UI_CraftQuantityPanel>().quantity;
+                inventoryPickUp.AddItemFromShop(item.item, item.quantity * quantitySelector, mainInventory, toolbarInventory);
+                foreach (ItemCraftRequirements requirements in item.ItemRequirements)
+                {
+                    int reminder = inventoryPickUp.RemoveItemQuantityFromInventory(requirements.itemRequired, requirements.quantityRequired * quantitySelector, mainInventory);
+                    if (reminder > 0)
+                    {
+                        inventoryPickUp.RemoveItemQuantityFromInventory(requirements.itemRequired, reminder, toolbarInventory);
+                    }
+                }
+            }
+
+    }
+
+    #region Show/Hide/Escape
     public void Show()
     {
+        
         for (int i = 0; i < itemListPage.transform.childCount; i++)
         {
             itemListPage.GetChild(i).gameObject.GetComponent<UI_CraftItem>().Deselect();
         }
         itemListPage.GetChild(0).gameObject.GetComponent<UI_CraftItem>().Select();
-        gameObject.SetActive(true);
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+        else if (gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
+        }
+           
         GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().InventoryShow();
     }
+
 
     private void Hide()
     {
@@ -185,11 +223,15 @@ public class CraftSysteme : MonoBehaviour
 
     public void Escape(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && gameObject.activeSelf)
         {
             Hide();
         }
     }
+
+    #endregion
+
+    #region struct
     [Serializable]
     public struct ItemCraft
     {
@@ -206,4 +248,5 @@ public class CraftSysteme : MonoBehaviour
         public LootFortune itemRequired;
         public int quantityRequired;
     }
+    #endregion
 }

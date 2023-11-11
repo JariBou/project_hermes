@@ -71,6 +71,7 @@ namespace Inventory
         public GameObject ChestInventoryPanel;
         public GameObject ShopPanel;
         public GameObject RemoveQuantityPanel;
+        public GameObject CraftPanel;
         private void Awake()
         {
             _playerInput = new InputGame();
@@ -306,7 +307,7 @@ namespace Inventory
                         Inventories["MainInventory"].RemoveItem(itemIndex, inventoryItem.quantity);
 
                     }
-                    if (InventaireSouris == "MainInventory" && inventoryUI.isActiveAndEnabled && !Inventories[ChestInventoryPanel.GetComponent<TaggedObject>().tagDynamic].IsInventoryFull() && ChestInventoryPanel.activeSelf)
+                    else if (InventaireSouris == "MainInventory" && inventoryUI.isActiveAndEnabled && !Inventories[ChestInventoryPanel.GetComponent<TaggedObject>().tagDynamic].IsInventoryFull() && ChestInventoryPanel.activeSelf)
                     {
                         foreach (var itm in Inventories[ChestInventoryPanel.GetComponent<TaggedObject>().tagDynamic].inventoryItems.Select((value, i) => new { i, value }))
                         {
@@ -415,7 +416,8 @@ namespace Inventory
                 lootGameObject.GetComponent<SpriteRenderer>().sprite = Inventories[lastInventoryRecorded].GetItemAt(itemIndex).item.lootSprite;
             }
             Inventories[lastInventoryRecorded].RemoveItem(itemIndex, quantity);
-            UIinventory.ResetSelection();   
+            UIinventory.ResetSelection();
+            CraftPanel.GetComponent<CraftSysteme>().SetTable(CraftPanel.GetComponent<CraftSysteme>().SelectedItem);
         }
 
         public void PerformAction(int itemIndex)
@@ -430,6 +432,7 @@ namespace Inventory
             if (destroyableItem != null)
             {
                 Inventories[lastInventoryRecorded].RemoveItem(itemIndex, 1);
+                CraftPanel.GetComponent<CraftSysteme>().SetTable(CraftPanel.GetComponent<CraftSysteme>().SelectedItem);
                 UIinventory.ResetSelection();
             }
 
@@ -437,7 +440,8 @@ namespace Inventory
             if (itemAction != null)
             {
                 itemAction.PerformAction(gameObject, inventoryItem.itemState);
-                if(inventoryItem.IsEmpty)
+                CraftPanel.GetComponent<CraftSysteme>().SetTable(CraftPanel.GetComponent<CraftSysteme>().SelectedItem);
+                if (inventoryItem.IsEmpty)
                 {
                     UIinventory.ResetSelection();
                 }
