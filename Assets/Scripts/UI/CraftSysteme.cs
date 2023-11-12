@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using System.Diagnostics;
 using Inventory;
 using UnityEngine.InputSystem;
+using static Pathfinding.RaycastModifier;
 
 public class CraftSysteme : MonoBehaviour
 {
@@ -35,6 +36,9 @@ public class CraftSysteme : MonoBehaviour
     public Transform contentTable;
     [SerializeField] private GameObject contentItemTablePrefab;
 
+    [Header("Gestion du Quantity Panel")]
+    [SerializeField] private UI_CraftQuantityPanel quantityPanel;
+
 
     private void Awake()
     {
@@ -53,6 +57,7 @@ public class CraftSysteme : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
     }
 
     IEnumerator Wait1FrameBeforeDo() // Solution dégueulasse pour régler un problème qui fesait que le tableau ne s'affichait pas à la première ouverture du panel craft
@@ -118,6 +123,11 @@ public class CraftSysteme : MonoBehaviour
                 tableManager.requiredItemName.text = item.ItemRequirements[i].itemRequired.name;
                 tableManager.totalQuantityRequired.text = item.ItemRequirements[i].quantityRequired.ToString();
                 tableManager.quantitPossed.text = FindQuantityPossed(item.ItemRequirements[i].itemRequired).ToString();
+                if (item.ItemRequirements[i].quantityRequired > FindQuantityPossed(item.ItemRequirements[i].itemRequired))
+                {
+                    tableManager.ChangeTextColor(Color.red);
+                    quantityPanel.inputField.textComponent.color = Color.red;
+                }
             }
         }
     }
@@ -127,13 +137,47 @@ public class CraftSysteme : MonoBehaviour
         if (FindIndexWithItemName(SelectedItem) != -1)
         {
             ItemCraft item = listItemCraft[FindIndexWithItemName(SelectedItem)];
-            for (int i = 0; i< item.ItemRequirements.Count; i++)
+            bool canBeWhite = true;
+            for (int i = 0; i < item.ItemRequirements.Count; i++)
             {
                 GameObject line = contentTable.transform.GetChild(i).gameObject;
                 TableManager tableManager = line.GetComponent<TableManager>();
                 tableManager.totalQuantityRequired.text = (item.ItemRequirements[i].quantityRequired * quantity).ToString();
+                if (item.ItemRequirements[i].quantityRequired * quantity > FindQuantityPossed(item.ItemRequirements[i].itemRequired))
+                {
+                    if (!tableManager.isRed)
+                    {
+                        tableManager.ChangeTextColor(Color.red);
+                        quantityPanel.inputField.textComponent.color = Color.red;
+                    }
+                    canBeWhite = false;
+
+                }
+                else if (item.ItemRequirements[i].quantityRequired * quantity <= FindQuantityPossed(item.ItemRequirements[i].itemRequired) && tableManager.isRed)
+                {
+                    tableManager.ChangeTextColor(Color.white);
+                }
             }
+
+            if (canBeWhite)
+            {
+                quantityPanel.inputField.textComponent.color = Color.white;
+            }
+
         }
+    }
+
+    public void ChangeSelectedItem()
+    {
+        ItemCraft item = listItemCraft[FindIndexWithItemName(SelectedItem)];
+        for (int i = 0; i < item.ItemRequirements.Count; i++)
+        {
+            GameObject line = contentTable.transform.GetChild(i).gameObject;
+            TableManager tableManager = line.GetComponent<TableManager>();
+            tableManager.ChangeTextColor(Color.white);
+
+        }
+        quantityPanel.inputField.textComponent.color = Color.white;
     }
 
     public int FindIndexWithItemName(string itemName)
@@ -174,10 +218,10 @@ public class CraftSysteme : MonoBehaviour
         bool canCraft = true;
         foreach (ItemCraftRequirements craftRequirement in item.ItemRequirements)
         {
-            if (craftRequirement.quantityRequired > FindQuantityPossed(craftRequirement.itemRequired)) canCraft = false;
+            if (craftRequirement.quantityRequired * quantityPanel.quantity > FindQuantityPossed(craftRequirement.itemRequired)) canCraft = false;
         }
         if (canCraft)
-            {
+        {
                 InventoryPickUpSystem inventoryPickUp = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryPickUpSystem>();
                 int quantitySelector = GameObject.FindGameObjectWithTag("QuantitySelector").GetComponent<UI_CraftQuantityPanel>().quantity;
                 inventoryPickUp.AddItemFromShop(item.item, item.quantity * quantitySelector, mainInventory, toolbarInventory);
@@ -189,7 +233,8 @@ public class CraftSysteme : MonoBehaviour
                         inventoryPickUp.RemoveItemQuantityFromInventory(requirements.itemRequired, reminder, toolbarInventory);
                     }
                 }
-            }
+                SetTable(SelectedItem);
+        }
 
     }
 

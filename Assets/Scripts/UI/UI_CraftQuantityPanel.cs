@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 public class UI_CraftQuantityPanel : MonoBehaviour
 {
     public int quantity;
-    [SerializeField] private TMP_InputField inputField;
+    public TMP_InputField inputField;
 
     private InputGame _playerInput;
     [SerializeField] private int maxValue = 100;
@@ -75,11 +75,6 @@ public class UI_CraftQuantityPanel : MonoBehaviour
     {
         quantity = newQuantity;
         inputField.text = newQuantity.ToString();
-    }
-    public void ChangeColor(Color color)
-    {
-        inputField.caretColor = color;
-
     }
     public void Submit(InputAction.CallbackContext context)
     {

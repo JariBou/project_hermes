@@ -54,6 +54,7 @@ public class UI_CraftItem : MonoBehaviour, IPointerClickHandler
         {
             /*Debug.Log("Changement d'Item");*/
             craftSystem.SelectedItem = nameItem;
+            craftSystem.ChangeSelectedItem();
             for (int i = 0; i < gameObject.transform.parent.childCount; i++)
             {
                 gameObject.transform.parent.GetChild(i).GetComponent<UI_CraftItem>().Deselect();
@@ -67,7 +68,12 @@ public class UI_CraftItem : MonoBehaviour, IPointerClickHandler
         quantityPanel.ChangeQuantity(1);
         borderImage.enabled = true;
         craftSystem.SelectedItem = nameItem;
-        gameObject.transform.parent.transform.parent.GetComponent<CraftSysteme>().SetData(nameItem);
+        GameObject gameObject1 = transform.parent.gameObject;
+        while (gameObject1.GetComponent<CraftSysteme>() == null)
+        {
+            gameObject1 = gameObject1.transform.parent.gameObject;
+        }
+        gameObject1.GetComponent<CraftSysteme>().SetData(nameItem);
 
     }
 }

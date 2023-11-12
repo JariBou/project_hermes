@@ -8,6 +8,7 @@ public class TableManager : MonoBehaviour
     public TextMeshProUGUI quantitPossed;
     public TextMeshProUGUI requiredItemName;
     public TextMeshProUGUI totalQuantityRequired;
+    public bool isRed;
 
 
 
@@ -25,6 +26,8 @@ public class TableManager : MonoBehaviour
         quantitPossed.color = color;
         requiredItemName.color = color;
         totalQuantityRequired.color = color;
+        if (color == Color.red) isRed = true;
+        if (color == Color.white) isRed = false;
     }
 
 
